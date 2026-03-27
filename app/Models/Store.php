@@ -8,4 +8,15 @@ use Illuminate\Database\Eloquent\Model;
 class Store extends Model
 {
     use HasFactory;
+    protected $guarded = [];
+
+    public function prices()
+    {
+        return $this->hasMany(ProductPrice::class);
+    }
+
+    public function aliases()
+    {
+        return $this->hasMany(ProductAliase::class);
+    }
 }
