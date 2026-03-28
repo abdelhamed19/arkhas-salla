@@ -22,7 +22,7 @@ class Product extends Model
 
     public function prices()
     {
-        return $this->hasMany(ProductPrice::class);
+        return $this->hasMany(ProductPrice::class)->with('history');
     }
 
 }

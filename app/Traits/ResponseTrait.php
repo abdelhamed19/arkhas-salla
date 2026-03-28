@@ -6,32 +6,57 @@ use Symfony\Component\HttpFoundation\Response;
 
 trait ResponseTrait
 {
+
+    public function paginatedData($collection)
+    {
+        return [
+            'currentPage' => $collection->currentPage(),
+            'lastPage' => $collection->lastPage(),
+            'total' => $collection->total(),
+            'nextPageUrl' => $collection->nextPageUrl(),
+            'previousPageUrl' => $collection->previousPageUrl(),
+            'links' => $collection->getUrlRange(1, $collection->lastPage())
+        ];
+    }
+
     public function successResponse($data)
     {
         return response()->json([
             'success' => true,
-            'data' => $data,
+            'results' => $data,
         ], Response::HTTP_OK);
     }
+
     public function failResponse($message, $code = null)
     {
         return response()->json([
             'success' => false,
-            'message' => $message,
-        ], $code ?? Response::HTTP_BAD_REQUEST);
+            'errors' => $message,
+        ], $code ?? Response::HTTP_INTERNAL_SERVER_ERROR);
     }
+
     public function unauthorizedResponse($message = null)
     {
         return response()->json([
             'success' => false,
-            'message' => $message ?? 'Unauthorized',
+            'errors' => $message ?? 'Unauthorized',
         ], Response::HTTP_UNAUTHORIZED);
     }
+
     public function notFoundResponse($message = null)
     {
         return response()->json([
             'success' => false,
-            'message' => $message ?? 'Not Found',
+            'errors' => $message ?? 'Not Found',
         ], Response::HTTP_NOT_FOUND);
     }
+
+    public function validationErrors($errors)
+    {
+        return response()->json([
+            'success' => false,
+            'errors' => $errors,
+        ], Response::HTTP_BAD_REQUEST);
+    }
+    
 }

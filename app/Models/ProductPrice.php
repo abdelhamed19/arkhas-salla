@@ -12,6 +12,11 @@ class ProductPrice extends Model
 
     public function history()
     {
-        return $this->hasMany(PriceHistory::class);
+        return $this->hasMany(PriceHistory::class, 'price_id');
+    }
+
+    public function store()
+    {
+        return $this->belongsTo(Store::class);
     }
 }
