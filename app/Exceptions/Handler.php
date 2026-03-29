@@ -2,11 +2,16 @@
 
 namespace App\Exceptions;
 
+use App\Traits\ResponseTrait;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Illuminate\Http\Request;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\Routing\Exception\RouteNotFoundException;
 use Throwable;
 
 class Handler extends ExceptionHandler
 {
+    use ResponseTrait;
     /**
      * A list of exception types with their corresponding custom log levels.
      *
@@ -41,8 +46,26 @@ class Handler extends ExceptionHandler
      */
     public function register(): void
     {
-        $this->reportable(function (Throwable $e) {
-            //
+        $this->renderable(function (Throwable $e, Request $request) {
+            if ($request->is('api/*')) {
+                $statusCode = $this->getStatusCode($e);
+                $message = $e->getMessage() ?: __('api.error_occurred');
+                $trace = $e->getTrace();
+                return $this->failResponse($message, $trace, $statusCode);
+            }
         });
+    }
+    protected function getStatusCode(Throwable $exception): int
+    {
+        if (
+            $exception instanceof NotFoundHttpException ||
+            $exception instanceof RouteNotFoundException
+        ) {
+            return 404;
+        }
+
+        return method_exists($exception, 'getStatusCode')
+            ? $exception->getStatusCode()
+            : 500;
     }
 }

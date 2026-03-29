@@ -2,41 +2,51 @@
 namespace App\Services;
 
 use App\Models\Product;
+use Illuminate\Support\Facades\Cache;
 
 class ProductService
 {
-    public function findAllProducts($filters)
+    public function findAllProducts(array $filters)
     {
-        $query = Product::with(['category']);
+        $page = $filters['page'] ?? request()->get('page', 1);
+        $cacheKey = $this->generateCacheKey($filters, $page);
 
-        if (!empty($filters['name'])) {
+        return Cache::tags('products')->remember($cacheKey, now()->addMinutes(30), function () use ($filters) {
 
-            $search = trim($filters['name']);
+            $query = Product::with(['category']);
 
-            $query->where(function ($q) use ($search) {
+            if (!empty($filters['name'])) {
+                $search = trim($filters['name']);
 
-                $q->whereRaw(
-                    "MATCH(name_ar, name_en) AGAINST(? IN NATURAL LANGUAGE MODE)",
-                    [$search]
-                )
-                    ->orWhere('name_ar', 'like', "%$search%")
-                    ->orWhere('name_en', 'like', "%$search%");
-            });
-        }
+                $query->where(function ($q) use ($search) {
+                    $q->whereRaw(
+                        "MATCH(name_ar, name_en) AGAINST(? IN NATURAL LANGUAGE MODE)",
+                        [$search]
+                    )
+                        ->orWhere('name_ar', 'like', "%{$search}%")
+                        ->orWhere('name_en', 'like', "%{$search}%");
+                });
+            }
 
-        if (!empty($filters['category'])) {
-            $category = $filters['category'];
-            $query->where('category_id', $category);
-        }
+            if (!empty($filters['category'])) {
+                $query->where('category_id', $filters['category']);
+            }
 
-        if (!empty($filters['price_order'])) {
-            $priceOrder = $filters['price_order'];
-            $query->orderBy('avg_price', $priceOrder);
-        }
+            if (!empty($filters['price_order'])) {
+                $query->orderBy('avg_price', $filters['price_order']);
+            } else {
+                $query->orderBy('created_at', 'DESC');
+            }
 
-        $query->orderBy('created_at', 'DESC');
+            return $query->paginate(10);
+        });
+    }
 
-        return $query->paginate(10);
+    protected function generateCacheKey(array $filters, $page)
+    {
+        ksort($filters);
+
+        return 'products_listing_' . md5(json_encode($filters)) . '_page_' . $page;
     }
 
     public function getProduct($id)
@@ -46,4 +56,5 @@ class ProductService
             ->first();
         return $product ?? null;
     }
+
 }

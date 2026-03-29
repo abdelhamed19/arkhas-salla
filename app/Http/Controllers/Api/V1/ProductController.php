@@ -12,8 +12,9 @@ use App\Traits\ResponseTrait;
 class ProductController extends Controller
 {
     use ResponseTrait;
-    public function __construct(private ProductService $productService)
-    {
+    public function __construct(
+        private ProductService $productService,
+    ) {
     }
 
     public function index(GetAllProductsRequest $request)

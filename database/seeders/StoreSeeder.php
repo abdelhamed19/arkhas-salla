@@ -22,31 +22,31 @@ class StoreSeeder extends Seeder
             ],
             [
                 'name' => 'Jumia',
-                'logo_url' => 'https://upload.wikimedia.org/wikipedia/commons/8/8a/Jumia_Logo.svg',
+                'logo_url' => 'https://upload.wikimedia.org/wikipedia/commons/a/a7/Jumia_Group-Logo.png',
                 'scrape_url' => 'https://www.jumia.com.eg/',
                 'is_active' => true,
             ],
             [
                 'name' => 'Noon',
-                'logo_url' => 'https://upload.wikimedia.org/wikipedia/commons/9/9f/Noon_Logo.svg',
+                'logo_url' => 'https://upload.wikimedia.org/wikipedia/commons/c/ca/Noon_Website_Logo.svg',
                 'scrape_url' => 'https://www.noon.com/egypt-ar/',
                 'is_active' => true,
             ],
             [
                 'name' => 'Souq',
-                'logo_url' => 'https://www.souq.com/favicon.ico', // Souq أصبح جزء من Amazon
+                'logo_url' => 'https://upload.wikimedia.org/wikipedia/commons/a/a9/Amazon_logo.svg',
                 'scrape_url' => 'https://egypt.souq.com/',
                 'is_active' => false,
             ],
             [
                 'name' => 'Btech',
-                'logo_url' => 'https://btech.com/favicon.ico',
+                'logo_url' => 'https://upload.wikimedia.org/wikipedia/commons/d/dd/BTECH_Logo.png',
                 'scrape_url' => 'https://btech.com/',
                 'is_active' => true,
             ],
             [
                 'name' => '2B',
-                'logo_url' => 'https://2b.com.eg/favicon.ico',
+                'logo_url' => 'https://2b.com.eg/assets/images/logo.png',
                 'scrape_url' => 'https://2b.com.eg/',
                 'is_active' => true,
             ],
@@ -65,7 +65,7 @@ class StoreSeeder extends Seeder
         ];
 
         foreach ($stores as $store) {
-            // توليد slug من الاسم (مثال: Amazon → amazon)
+
             $slug = Str::slug($store['name'], '-');
 
             DB::table('stores')->insert([
@@ -78,7 +78,5 @@ class StoreSeeder extends Seeder
                 'updated_at' => now(),
             ]);
         }
-
-        $this->command->info('✅ تم إضافة ' . count($stores) . ' متجر بنجاح!');
     }
 }

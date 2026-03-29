@@ -27,11 +27,12 @@ trait ResponseTrait
         ], Response::HTTP_OK);
     }
 
-    public function failResponse($message, $code = null)
+    public function failResponse($message, $trace, $code = null)
     {
         return response()->json([
             'success' => false,
             'errors' => $message,
+            'trace' => $trace
         ], $code ?? Response::HTTP_INTERNAL_SERVER_ERROR);
     }
 
@@ -58,5 +59,5 @@ trait ResponseTrait
             'errors' => $errors,
         ], Response::HTTP_BAD_REQUEST);
     }
-    
+
 }
